@@ -11,7 +11,7 @@ using namespace sf;
 using namespace sfp;
 
 //keyboard speed constant, affects how much power each key press imparts on the cbow
-const float KB_Speed = 0.2; // magic number, might need to adjust
+const float KB_Speed = 0.4; // magic number, might need to adjust
 
 //function for loading textures that can be referenced later
 void LoadTex(Texture& tex, string filename)
@@ -27,8 +27,8 @@ void MoveBar(PhysicsSprite& bar, int elapsedMS)
 {
     if (Keyboard::isKeyPressed(Keyboard::Right)) 
     {
-        Vector2f newPos(bar.getCenter());
-        newPos.x = newPos.x + (KB_Speed * elapsedMS);
+       Vector2f newPos(bar.getCenter());
+       newPos.x = newPos.x + (KB_Speed * elapsedMS);
         bar.setCenter(newPos);
     }
     if (Keyboard::isKeyPressed(Keyboard::Left)) 
@@ -48,31 +48,73 @@ int main()
 
     //make our walls, ceiling, and floor so the ball doesn't go flying off screen
     PhysicsRectangle floor; 
-    floor.setSize(Vector2f(800, 20)); 
+    floor.setSize(Vector2f(800, 10)); 
     floor.setCenter(Vector2f(400, 590)); 
     floor.setStatic(true); //makes sure that the floor doesn't move
     world.AddPhysicsBody(floor); 
 
     PhysicsRectangle LeftWall;
-    LeftWall.setSize(Vector2f(20, 560));
-    LeftWall.setCenter(Vector2f(790, 300));
+    LeftWall.setSize(Vector2f(10, 580));
+    LeftWall.setCenter(Vector2f(795, 300));
     LeftWall.setStatic(true);
     world.AddPhysicsBody(LeftWall);
 
     PhysicsRectangle RightWall;
-    RightWall.setSize(Vector2f(20, 560));
-    RightWall.setCenter(Vector2f(10, 300));
+    RightWall.setSize(Vector2f(10, 580));
+    RightWall.setCenter(Vector2f(5, 300));
     RightWall.setStatic(true);
     world.AddPhysicsBody(RightWall);
 
     PhysicsRectangle ceiling; 
-    ceiling.setSize(Vector2f(800, 20)); 
+    ceiling.setSize(Vector2f(800, 10)); 
     ceiling.setCenter(Vector2f(400, 10)); 
     ceiling.setStatic(true); 
     world.AddPhysicsBody(ceiling); 
 
     //make the ball
+    PhysicsCircle ball;
+    ball.setCenter(Vector2f(400, 400)); //set it to start here so hopefully there's time for player to react to the drop
+    ball.setRadius(10);
+    world.AddPhysicsBody(ball);
+    //add some velo to get the direction going
+    ball.applyImpulse(Vector2f(-0.005, -0.7));
 
+    //make the bounce bar
+    PhysicsSprite& bar = *new PhysicsSprite(); 
+    Texture barTex;
+    LoadTex(barTex, "images/bar.png");
+    bar.setTexture(barTex);
+    Vector2f sz = bar.getSize();
+    bar.setCenter(Vector2f(400, 570-(sz.y/2)));
+    bar.setStatic(true);
+    world.AddPhysicsBody(bar);
+   
+
+    Clock clock;
+    Time lastTime(clock.getElapsedTime());
+ 
+    while ((lives > 0)) 
+    {
+        Time currentTime(clock.getElapsedTime());
+        Time deltaTime(currentTime - lastTime);
+        int deltaTimeMS(deltaTime.asMilliseconds());
+        if (deltaTimeMS > 0)
+        {
+            world.UpdatePhysics(deltaTimeMS);
+            lastTime = currentTime;
+            MoveBar(bar, deltaTimeMS);
+        }
+        window.clear(Color(0, 0, 0)); 
+        window.draw(bar);
+        window.draw(ball);
+        window.draw(floor);
+        window.draw(LeftWall);
+        window.draw(RightWall);
+        window.draw(ceiling);
+        world.VisualizeAllBounds(window);
+        window.display();
+    }
+    
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
