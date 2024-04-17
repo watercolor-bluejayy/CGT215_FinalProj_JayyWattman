@@ -19,6 +19,7 @@ void LoadTex(Texture& tex, string filename)
     if (!tex.loadFromFile(filename))
     {
         cout << "Could not load " << filename << endl;
+        exit(1);
     }
 }
 
@@ -45,6 +46,13 @@ int main()
     World world(Vector2f(0, 1)); //Gravity set to 1 so the ball will bounce
     int score(0); //start at zero because you haven't earned any points yet
     int lives(3); //start at 3 so it can decrement down
+
+    Font font;
+    if (!font.loadFromFile("arial.ttf"))
+    {
+        cout << "Could not load font" << endl;
+        exit(0);
+    } 
 
     //make our walls, ceiling, and floor so the ball doesn't go flying off screen
     PhysicsRectangle floor; 
@@ -134,7 +142,47 @@ int main()
         //world.VisualizeAllBounds(window);
         window.display();
     }
-    
+    bool exitGame(false); 
+    PhysicsRectangle backboard; 
+    backboard.setSize(Vector2f(500, 300)); 
+    backboard.setCenter(Vector2f(400, 300)); 
+    backboard.setFillColor(Color(134, 210, 117)); // light green
+    backboard.setStatic(true); 
+
+    Text gameOverT; 
+    gameOverT.setFont(font); 
+    gameOverT.setString("Game Over");
+    gameOverT.setFillColor(Color(0, 0, 0)); 
+    FloatRect goSz = gameOverT.getGlobalBounds();
+    gameOverT.setPosition(Vector2f(400 - (goSz.width / 2), 200 - (goSz.height)));
+
+    Text finalScore;
+    finalScore.setFont(font);
+    finalScore.setString("You scored: " + to_string(score) + " points!");
+    finalScore.setFillColor(Color(0, 0, 0));
+    FloatRect FinScoreSz = finalScore.getGlobalBounds();
+    finalScore.setPosition(Vector2f(400 - (FinScoreSz.width / 2), 300 - (FinScoreSz.height)));
+
+    Text leaveText;
+    leaveText.setFont(font);
+    leaveText.setString("Press SPACE to exit game");
+    leaveText.setFillColor(Color(0, 0, 0));
+    FloatRect ltSz = leaveText.getGlobalBounds();
+    leaveText.setPosition(Vector2f(400 - (ltSz.width / 2), 400 - (ltSz.height)));
+
+    while (!exitGame)
+    {
+        if (Keyboard::isKeyPressed(Keyboard::Space))
+        {
+            exitGame = true;
+        }
+        window.clear();
+        window.draw(backboard);
+        window.draw(gameOverT);
+        window.draw(finalScore);
+        window.draw(leaveText);
+        window.display();
+    }
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
