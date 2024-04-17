@@ -98,8 +98,10 @@ int main()
     world.AddPhysicsBody(bar);
    
     //let's start making the bricks
-    Texture redTex, orangeTex, yellTex, greenTex, blueTex, purpTex;
+    int hitCount(0);
+    Texture redTex, orangeTex, yellTex, greenTex, blueTex, purpTex, hitTex;
     LoadTex(redTex, "images/redBrick.png");
+    LoadTex(hitTex, "images/hit1.png");
     PhysicsShapeList<PhysicsSprite> redBricks;
     for (int i(0); i < 11; i++) 
     {
@@ -109,6 +111,21 @@ int main()
         rBrick.setCenter(Vector2f((((1000 / 10) * i)), 220)); 
         rBrick.setStatic(true);
         world.AddPhysicsBody(rBrick);
+        rBrick.onCollision = [&ball, &world, &rBrick, &redBricks, &score, &hitCount, &hitTex](PhysicsBodyCollisionResult result)
+            {
+                if (result.object2 == ball)
+                {
+                    ++hitCount;
+                    rBrick.setTexture(hitTex);
+                   
+                }
+                if (hitCount == 2)
+                {
+                    world.RemovePhysicsBody(rBrick);
+                    redBricks.QueueRemove(rBrick);
+                    score += 20;
+                }
+            };
     }
 
 
@@ -130,6 +147,7 @@ int main()
         window.clear(Color(0, 0, 0)); 
         window.draw(bar);
         window.draw(ball);
+        redBricks.DoRemovals();
         for (PhysicsShape& rBrick : redBricks) 
         {
             window.draw((PhysicsSprite&)rBrick); 
