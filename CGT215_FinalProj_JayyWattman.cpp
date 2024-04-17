@@ -11,7 +11,7 @@ using namespace sf;
 using namespace sfp;
 
 //keyboard speed constant, affects how much power each key press imparts on the cbow
-const float KB_Speed = 0.4; // magic number, might need to adjust
+const float KB_Speed = 0.6; // magic number, might need to adjust
 
 //function for loading textures that can be referenced later
 void LoadTex(Texture& tex, string filename)
@@ -86,7 +86,7 @@ int main()
     ball.setRadius(15);
     world.AddPhysicsBody(ball);
     //add some velo to get the direction going
-    ball.applyImpulse(Vector2f(-0.025, -0.55));
+    ball.applyImpulse(Vector2f(-0.025, -0.7));
 
     //make the bounce bar
     PhysicsSprite& bar = *new PhysicsSprite(); 
@@ -353,27 +353,33 @@ int main()
     PhysicsRectangle backboard; 
     backboard.setSize(Vector2f(600, 400)); 
     backboard.setCenter(Vector2f(500, 400)); 
-    backboard.setFillColor(Color(134, 210, 117)); // light green
+    backboard.setFillColor(Color(18, 197, 34)); // green
     backboard.setStatic(true); 
+
+    PhysicsRectangle frontboard;
+    frontboard.setSize(Vector2f(560, 360));
+    frontboard.setCenter(Vector2f(500, 400));
+    frontboard.setFillColor(Color(0, 0, 0)); //black
+    frontboard.setStatic(true);
 
     Text gameOverT; 
     gameOverT.setFont(font); 
     gameOverT.setString("Game Over");
-    gameOverT.setFillColor(Color(0, 0, 0)); 
+    gameOverT.setFillColor(Color(225, 240, 245)); 
     FloatRect goSz = gameOverT.getGlobalBounds();
     gameOverT.setPosition(Vector2f(500 - (goSz.width / 2), 266 - (goSz.height)));
 
     Text finalScore;
     finalScore.setFont(font);
     finalScore.setString("You scored: " + to_string(score) + " points!");
-    finalScore.setFillColor(Color(0, 0, 0));
+    finalScore.setFillColor(Color(225, 240, 245));
     FloatRect FinScoreSz = finalScore.getGlobalBounds();
     finalScore.setPosition(Vector2f(500 - (FinScoreSz.width / 2), 400 - (FinScoreSz.height)));
 
     Text leaveText;
     leaveText.setFont(font);
     leaveText.setString("Press SPACE to exit game");
-    leaveText.setFillColor(Color(0, 0, 0));
+    leaveText.setFillColor(Color(225, 240, 245));
     FloatRect ltSz = leaveText.getGlobalBounds();
     leaveText.setPosition(Vector2f(500 - (ltSz.width / 2), 500 - (ltSz.height)));
 
@@ -385,6 +391,7 @@ int main()
         }
         window.clear();
         window.draw(backboard);
+        window.draw(frontboard);
         window.draw(gameOverT);
         window.draw(finalScore);
         window.draw(leaveText);
