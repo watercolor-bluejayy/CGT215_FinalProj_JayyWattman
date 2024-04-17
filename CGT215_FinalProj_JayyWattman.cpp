@@ -86,7 +86,7 @@ int main()
     ball.setRadius(15);
     world.AddPhysicsBody(ball);
     //add some velo to get the direction going
-    ball.applyImpulse(Vector2f(-0.02, -0.5));
+    ball.applyImpulse(Vector2f(-0.025, -0.55));
 
     //make the bounce bar
     PhysicsSprite& bar = *new PhysicsSprite(); 
@@ -108,7 +108,7 @@ int main()
         };
    
     //let's start making the bricks
-    int hitCount(0);
+    int hitCount(0); //gonna need something to keep track of how many times a brick was hit
     Texture redTex, orangeTex, yellTex, greenTex, blueTex, purpTex, hitTex;
     LoadTex(hitTex, "images/hit1.png");
     LoadTex(redTex, "images/redBrick.png");
@@ -119,14 +119,14 @@ int main()
         rBrick.setTexture(redTex);
         Vector2f sz = rBrick.getSize();
         rBrick.setCenter(Vector2f((((1000 / 10) * i)), 220)); 
-        rBrick.setStatic(true);
+        rBrick.setStatic(true); //don't want em moving
         world.AddPhysicsBody(rBrick);
         rBrick.onCollision = [&ball, &world, &rBrick, &redBricks, &score, &hitCount, &hitTex](PhysicsBodyCollisionResult result)
             {
                 if (result.object2 == ball)
                 {
                     ++hitCount;
-                    rBrick.setTexture(hitTex);
+                    rBrick.setTexture(hitTex); //change the brick color so the player knows it has been hit
                    
                 }
                 if (hitCount == 2)
@@ -134,6 +134,7 @@ int main()
                     world.RemovePhysicsBody(rBrick);
                     redBricks.QueueRemove(rBrick);
                     score += 20;
+                    hitCount = 0;
                 }
             };
     }
@@ -161,10 +162,122 @@ int main()
                     world.RemovePhysicsBody(oBrick);
                     orangeBricks.QueueRemove(oBrick);
                     score += 20;
+                    hitCount = 0;
                 }
             };
     }
 
+    LoadTex(yellTex, "images/yellowBrick.png");
+    PhysicsShapeList<PhysicsSprite> yellowBricks;
+    for (int i(0); i < 11; i++)
+    {
+        PhysicsSprite& yBrick = yellowBricks.Create();
+        yBrick.setTexture(yellTex);
+        Vector2f sz = yBrick.getSize();
+        yBrick.setCenter(Vector2f((((1000 / 10) * i)), 150));
+        yBrick.setStatic(true);
+        world.AddPhysicsBody(yBrick);
+        yBrick.onCollision = [&ball, &world, &yBrick, &yellowBricks, &score, &hitCount, &hitTex](PhysicsBodyCollisionResult result)
+            {
+                if (result.object2 == ball)
+                {
+                    ++hitCount;
+                    yBrick.setTexture(hitTex);
+
+                }
+                if (hitCount == 2)
+                {
+                    world.RemovePhysicsBody(yBrick);
+                    yellowBricks.QueueRemove(yBrick);
+                    score += 20;
+                    hitCount = 0;
+                }
+            };
+    }
+
+    LoadTex(greenTex, "images/greenBrick.png");
+    PhysicsShapeList<PhysicsSprite> greenBricks;
+    for (int i(0); i < 11; i++)
+    {
+        PhysicsSprite& gBrick = greenBricks.Create();
+        gBrick.setTexture(greenTex);
+        Vector2f sz = gBrick.getSize();
+        gBrick.setCenter(Vector2f((((1000 / 10) * i)), 115));
+        gBrick.setStatic(true);
+        world.AddPhysicsBody(gBrick);
+        gBrick.onCollision = [&ball, &world, &gBrick, &greenBricks, &score, &hitCount, &hitTex](PhysicsBodyCollisionResult result)
+            {
+                if (result.object2 == ball)
+                {
+                    ++hitCount;
+                    gBrick.setTexture(hitTex);
+
+                }
+                if (hitCount == 2)
+                {
+                    world.RemovePhysicsBody(gBrick);
+                    greenBricks.QueueRemove(gBrick);
+                    score += 20;
+                    hitCount = 0;
+                }
+            };
+    }
+
+    LoadTex(blueTex, "images/blueBrick.png");
+    PhysicsShapeList<PhysicsSprite> blueBricks;
+    for (int i(0); i < 11; i++)
+    {
+        PhysicsSprite& bBrick = blueBricks.Create();
+        bBrick.setTexture(blueTex);
+        Vector2f sz = bBrick.getSize();
+        bBrick.setCenter(Vector2f((((1000 / 10) * i)), 80));
+        bBrick.setStatic(true);
+        world.AddPhysicsBody(bBrick);
+        bBrick.onCollision = [&ball, &world, &bBrick, &blueBricks, &score, &hitCount, &hitTex](PhysicsBodyCollisionResult result)
+            {
+                if (result.object2 == ball)
+                {
+                    ++hitCount;
+                    bBrick.setTexture(hitTex);
+
+                }
+                if (hitCount == 2)
+                {
+                    world.RemovePhysicsBody(bBrick);
+                    blueBricks.QueueRemove(bBrick);
+                    score += 20;
+                    hitCount = 0;
+                }
+            };
+    }
+
+    LoadTex(purpTex, "images/purpBrick.png");
+    PhysicsShapeList<PhysicsSprite> purpBricks;
+    for (int i(0); i < 11; i++)
+    {
+        PhysicsSprite& pBrick = purpBricks.Create();
+        pBrick.setTexture(purpTex);
+        Vector2f sz = pBrick.getSize();
+        pBrick.setCenter(Vector2f((((1000 / 10) * i)),45)); 
+        pBrick.setStatic(true);
+        world.AddPhysicsBody(pBrick);
+        pBrick.onCollision = [&ball, &world, &pBrick, &purpBricks, &score, &hitCount, &hitTex](PhysicsBodyCollisionResult result)
+            {
+                if (result.object2 == ball)
+                {
+                    ++hitCount;
+                    pBrick.setTexture(hitTex);
+
+                }
+                if (hitCount == 2)
+                {
+                    world.RemovePhysicsBody(pBrick);
+                    purpBricks.QueueRemove(pBrick);
+                    score += 20;
+                    hitCount = 0;
+                }
+            };
+    }
 
     Clock clock;
     Time lastTime(clock.getElapsedTime());
@@ -194,7 +307,26 @@ int main()
         {
             window.draw((PhysicsSprite&)oBrick);
         }
-
+        yellowBricks.DoRemovals();
+        for (PhysicsShape& yBrick : yellowBricks)
+        {
+            window.draw((PhysicsSprite&)yBrick);
+        }
+        greenBricks.DoRemovals();
+        for (PhysicsShape& gBrick : greenBricks)
+        {
+            window.draw((PhysicsSprite&)gBrick);
+        }
+        blueBricks.DoRemovals();
+        for (PhysicsShape& bBrick : blueBricks)
+        {
+            window.draw((PhysicsSprite&)bBrick);
+        }
+        purpBricks.DoRemovals(); 
+        for (PhysicsShape& pBrick : purpBricks)
+        {
+            window.draw((PhysicsSprite&)pBrick);
+        }
         Text scoreText;
         scoreText.setString("Score: " + (to_string(score)));
         scoreText.setFont(font);
