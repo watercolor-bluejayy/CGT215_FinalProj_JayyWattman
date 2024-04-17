@@ -60,6 +60,7 @@ int main()
     floor.setCenter(Vector2f(500, 790)); 
     floor.setStatic(true); //makes sure that the floor doesn't move
     world.AddPhysicsBody(floor); 
+  
 
     PhysicsRectangle LeftWall;
     LeftWall.setSize(Vector2f(10, 780));
@@ -90,18 +91,27 @@ int main()
     //make the bounce bar
     PhysicsSprite& bar = *new PhysicsSprite(); 
     Texture barTex;
-    LoadTex(barTex, "images/bar.png");
+    LoadTex(barTex, "images/bar2.png");
     bar.setTexture(barTex);
     Vector2f sz = bar.getSize();
     bar.setCenter(Vector2f(500, 770-(sz.y/2)));
     bar.setStatic(true);
     world.AddPhysicsBody(bar);
+
+    floor.onCollision = [&lives, &ball](PhysicsBodyCollisionResult result)
+        {
+            if (result.object2 == ball)
+            {
+                lives--;
+
+            }
+        };
    
     //let's start making the bricks
     int hitCount(0);
     Texture redTex, orangeTex, yellTex, greenTex, blueTex, purpTex, hitTex;
-    LoadTex(redTex, "images/redBrick.png");
     LoadTex(hitTex, "images/hit1.png");
+    LoadTex(redTex, "images/redBrick.png");
     PhysicsShapeList<PhysicsSprite> redBricks;
     for (int i(0); i < 11; i++) 
     {
@@ -123,6 +133,33 @@ int main()
                 {
                     world.RemovePhysicsBody(rBrick);
                     redBricks.QueueRemove(rBrick);
+                    score += 20;
+                }
+            };
+    }
+
+    LoadTex(orangeTex, "images/orangeBrick.png");
+    PhysicsShapeList<PhysicsSprite> orangeBricks;
+    for (int i(0); i < 11; i++)
+    {
+        PhysicsSprite& oBrick = orangeBricks.Create();
+        oBrick.setTexture(orangeTex);
+        Vector2f sz = oBrick.getSize();
+        oBrick.setCenter(Vector2f((((1000 / 10) * i)), 185));
+        oBrick.setStatic(true);
+        world.AddPhysicsBody(oBrick);
+        oBrick.onCollision = [&ball, &world, &oBrick, &orangeBricks, &score, &hitCount, &hitTex](PhysicsBodyCollisionResult result)
+            {
+                if (result.object2 == ball)
+                {
+                    ++hitCount;
+                    oBrick.setTexture(hitTex);
+
+                }
+                if (hitCount == 2)
+                {
+                    world.RemovePhysicsBody(oBrick);
+                    orangeBricks.QueueRemove(oBrick);
                     score += 20;
                 }
             };
@@ -152,9 +189,29 @@ int main()
         {
             window.draw((PhysicsSprite&)rBrick); 
         }
+        orangeBricks.DoRemovals();
+        for (PhysicsShape& oBrick : orangeBricks)
+        {
+            window.draw((PhysicsSprite&)oBrick);
+        }
+
+        Text scoreText;
+        scoreText.setString("Score: " + (to_string(score)));
+        scoreText.setFont(font);
+        FloatRect scoreSz(scoreText.getGlobalBounds());
+        scoreText.setPosition(Vector2f(920 - (scoreSz.width), 760 - (scoreSz.height)));
+        window.draw(scoreText);
+
+        Text livesText;
+        livesText.setString("Lives: " + (to_string(lives)));
+        livesText.setFont(font);
+        FloatRect livesSz(livesText.getGlobalBounds()); 
+        livesText.setPosition(Vector2f(30, 760 - (livesSz.height)));
+        window.draw(livesText);
+
         window.draw(floor);
-        window.draw(LeftWall);
-        window.draw(RightWall);
+        //window.draw(LeftWall);
+        //window.draw(RightWall);
         window.draw(ceiling);
         
         //world.VisualizeAllBounds(window);
@@ -162,8 +219,8 @@ int main()
     }
     bool exitGame(false); 
     PhysicsRectangle backboard; 
-    backboard.setSize(Vector2f(500, 300)); 
-    backboard.setCenter(Vector2f(400, 300)); 
+    backboard.setSize(Vector2f(600, 400)); 
+    backboard.setCenter(Vector2f(500, 400)); 
     backboard.setFillColor(Color(134, 210, 117)); // light green
     backboard.setStatic(true); 
 
@@ -172,21 +229,21 @@ int main()
     gameOverT.setString("Game Over");
     gameOverT.setFillColor(Color(0, 0, 0)); 
     FloatRect goSz = gameOverT.getGlobalBounds();
-    gameOverT.setPosition(Vector2f(400 - (goSz.width / 2), 200 - (goSz.height)));
+    gameOverT.setPosition(Vector2f(500 - (goSz.width / 2), 266 - (goSz.height)));
 
     Text finalScore;
     finalScore.setFont(font);
     finalScore.setString("You scored: " + to_string(score) + " points!");
     finalScore.setFillColor(Color(0, 0, 0));
     FloatRect FinScoreSz = finalScore.getGlobalBounds();
-    finalScore.setPosition(Vector2f(400 - (FinScoreSz.width / 2), 300 - (FinScoreSz.height)));
+    finalScore.setPosition(Vector2f(500 - (FinScoreSz.width / 2), 400 - (FinScoreSz.height)));
 
     Text leaveText;
     leaveText.setFont(font);
     leaveText.setString("Press SPACE to exit game");
     leaveText.setFillColor(Color(0, 0, 0));
     FloatRect ltSz = leaveText.getGlobalBounds();
-    leaveText.setPosition(Vector2f(400 - (ltSz.width / 2), 400 - (ltSz.height)));
+    leaveText.setPosition(Vector2f(500 - (ltSz.width / 2), 500 - (ltSz.height)));
 
     while (!exitGame)
     {
