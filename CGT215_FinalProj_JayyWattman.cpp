@@ -41,43 +41,43 @@ void MoveBar(PhysicsSprite& bar, int elapsedMS)
 
 int main()
 {
-    RenderWindow window(VideoMode(800, 600), "BrickBreaker");
+    RenderWindow window(VideoMode(1000, 800), "BrickBreaker");
     World world(Vector2f(0, 1)); //Gravity set to 1 so the ball will bounce
     int score(0); //start at zero because you haven't earned any points yet
     int lives(3); //start at 3 so it can decrement down
 
     //make our walls, ceiling, and floor so the ball doesn't go flying off screen
     PhysicsRectangle floor; 
-    floor.setSize(Vector2f(800, 10)); 
-    floor.setCenter(Vector2f(400, 590)); 
+    floor.setSize(Vector2f(1000, 10)); 
+    floor.setCenter(Vector2f(500, 790)); 
     floor.setStatic(true); //makes sure that the floor doesn't move
     world.AddPhysicsBody(floor); 
 
     PhysicsRectangle LeftWall;
-    LeftWall.setSize(Vector2f(10, 580));
-    LeftWall.setCenter(Vector2f(795, 300));
+    LeftWall.setSize(Vector2f(10, 780));
+    LeftWall.setCenter(Vector2f(995, 400));
     LeftWall.setStatic(true);
     world.AddPhysicsBody(LeftWall);
 
     PhysicsRectangle RightWall;
-    RightWall.setSize(Vector2f(10, 580));
-    RightWall.setCenter(Vector2f(5, 300));
+    RightWall.setSize(Vector2f(10, 780));
+    RightWall.setCenter(Vector2f(5, 400));
     RightWall.setStatic(true);
     world.AddPhysicsBody(RightWall);
 
     PhysicsRectangle ceiling; 
-    ceiling.setSize(Vector2f(800, 10)); 
-    ceiling.setCenter(Vector2f(400, 10)); 
+    ceiling.setSize(Vector2f(1000, 10)); 
+    ceiling.setCenter(Vector2f(500, 10)); 
     ceiling.setStatic(true); 
     world.AddPhysicsBody(ceiling); 
 
     //make the ball
     PhysicsCircle ball;
-    ball.setCenter(Vector2f(400, 400)); //set it to start here so hopefully there's time for player to react to the drop
-    ball.setRadius(10);
+    ball.setCenter(Vector2f(500, 300)); //set it to start here so hopefully there's time for player to react to the drop
+    ball.setRadius(15);
     world.AddPhysicsBody(ball);
     //add some velo to get the direction going
-    ball.applyImpulse(Vector2f(-0.005, -0.7));
+    ball.applyImpulse(Vector2f(-0.02, -0.5));
 
     //make the bounce bar
     PhysicsSprite& bar = *new PhysicsSprite(); 
@@ -85,10 +85,24 @@ int main()
     LoadTex(barTex, "images/bar.png");
     bar.setTexture(barTex);
     Vector2f sz = bar.getSize();
-    bar.setCenter(Vector2f(400, 570-(sz.y/2)));
+    bar.setCenter(Vector2f(500, 770-(sz.y/2)));
     bar.setStatic(true);
     world.AddPhysicsBody(bar);
    
+    //let's start making the bricks
+    Texture redTex, orangeTex, yellTex, greenTex, blueTex, purpTex;
+    LoadTex(redTex, "images/redBrick.png");
+    PhysicsShapeList<PhysicsSprite> redBricks;
+    for (int i(0); i < 11; i++) 
+    {
+        PhysicsSprite& rBrick = redBricks.Create();
+        rBrick.setTexture(redTex);
+        Vector2f sz = rBrick.getSize();
+        rBrick.setCenter(Vector2f((((1000 / 10) * i)), 220)); 
+        rBrick.setStatic(true);
+        world.AddPhysicsBody(rBrick);
+    }
+
 
     Clock clock;
     Time lastTime(clock.getElapsedTime());
@@ -104,14 +118,20 @@ int main()
             lastTime = currentTime;
             MoveBar(bar, deltaTimeMS);
         }
+
         window.clear(Color(0, 0, 0)); 
         window.draw(bar);
         window.draw(ball);
+        for (PhysicsShape& rBrick : redBricks) 
+        {
+            window.draw((PhysicsSprite&)rBrick); 
+        }
         window.draw(floor);
         window.draw(LeftWall);
         window.draw(RightWall);
         window.draw(ceiling);
-        world.VisualizeAllBounds(window);
+        
+        //world.VisualizeAllBounds(window);
         window.display();
     }
     
