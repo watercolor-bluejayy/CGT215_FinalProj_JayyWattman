@@ -144,20 +144,23 @@ int main()
         rBrick.setCenter(Vector2f((((1000 / 10) * i)), 280)); 
         rBrick.setStatic(true); //don't want em moving
         world.AddPhysicsBody(rBrick);
-        rBrick.onCollision = [&ball, &world, &rBrick, &redBricks, &score, &hitCountR, &hitTex, &i](PhysicsBodyCollisionResult result)
+   
+        rBrick.onCollision = [&ball, &world, &rBrick, &redBricks, &score, &hitCountR, &hitTex, &i, &redTex](PhysicsBodyCollisionResult result)
             {
                 
                     if (result.object2 == ball)
                     {
                         ++hitCountR;
                         rBrick.setTexture(hitTex); //change the brick color so the player knows it has been hit
+                        
 
                     }
+
                     if (hitCountR == 2)
                     {
                         world.RemovePhysicsBody(rBrick);
                         redBricks.QueueRemove(rBrick);
-                        score += 20;
+                        score += 50;
                         hitCountR = 0;
                     }
                 
@@ -186,7 +189,7 @@ int main()
                 {
                     world.RemovePhysicsBody(oBrick);
                     orangeBricks.QueueRemove(oBrick);
-                    score += 20;
+                    score += 50;
                     hitCountO = 0;
                 }
             };
@@ -214,7 +217,7 @@ int main()
                 {
                     world.RemovePhysicsBody(yBrick);
                     yellowBricks.QueueRemove(yBrick);
-                    score += 20;
+                    score += 50;
                     hitCountY = 0;
                 }
             };
@@ -242,7 +245,7 @@ int main()
                 {
                     world.RemovePhysicsBody(gBrick);
                     greenBricks.QueueRemove(gBrick);
-                    score += 20;
+                    score += 50;
                     hitCountG = 0;
                 }
             };
@@ -270,7 +273,7 @@ int main()
                 {
                     world.RemovePhysicsBody(bBrick);
                     blueBricks.QueueRemove(bBrick);
-                    score += 20;
+                    score += 50;
                     hitCountB = 0;
                 }
             };
@@ -298,7 +301,7 @@ int main()
                 {
                     world.RemovePhysicsBody(pBrick);
                     purpBricks.QueueRemove(pBrick);
-                    score += 20;
+                    score += 50;
                     hitCountP = 0;
                 }
             };
