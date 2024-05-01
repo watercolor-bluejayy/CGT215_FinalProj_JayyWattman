@@ -99,7 +99,7 @@ int main()
     world.AddPhysicsBody(ball);
     
     //add some velo to get the direction going
-    ball.applyImpulse(Vector2f(-0.025, 1.1));
+    ball.applyImpulse(Vector2f(-0.04, 1.1));
 
     //make the bounce bar
     PhysicsSprite& bar = *new PhysicsSprite(); 
@@ -144,7 +144,7 @@ int main()
         rBrick.setCenter(Vector2f((((1000 / 10) * i)), 280)); 
         rBrick.setStatic(true); //don't want em moving
         world.AddPhysicsBody(rBrick);
-   
+  
         rBrick.onCollision = [&ball, &world, &rBrick, &redBricks, &score, &hitCountR, &hitTex, &i, &redTex](PhysicsBodyCollisionResult result)
             {
                 
@@ -153,7 +153,6 @@ int main()
                         ++hitCountR;
                         rBrick.setTexture(hitTex); //change the brick color so the player knows it has been hit
                         
-
                     }
 
                     if (hitCountR == 2)
@@ -162,6 +161,7 @@ int main()
                         redBricks.QueueRemove(rBrick);
                         score += 50;
                         hitCountR = 0;
+           
                     }
                 
             };
