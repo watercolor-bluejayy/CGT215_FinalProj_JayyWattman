@@ -1,5 +1,6 @@
 // CGT215_FinalProj_JayyWattman.cpp : This file contains the 'main' function. Brick Breaker game with music.
 //  Bar should be moveable with right and left arrow keys, bricks should change color after 1 hit and disappear after 2
+// coded by Jordyn "Jayy" Wattman on 04/15/2024 Updated 05/02/2024
 //
 
 #include <iostream>
