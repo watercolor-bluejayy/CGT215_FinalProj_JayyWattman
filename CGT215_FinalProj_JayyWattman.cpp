@@ -48,22 +48,22 @@ int main()
     RenderWindow window(VideoMode(1000, 800), "BrickBreaker");
     World world(Vector2f(0, 1)); //Gravity set to 1 so the ball will bounce
     int score(0); //start at zero because you haven't earned any points yet
-    int lives(5); //start at 5 so it can decrement down
+    int lives(3); //start at 5 so it can decrement down
 
     //get some music going
-    Music music;
+   /* Music music;
     if (!music.openFromFile("loop1.ogg")) {
         cout << "failed to load loop music";
         exit(6);
     }
-    music.play();
+    music.play();*/
 
     Font font;
     if (!font.loadFromFile("arial.ttf"))
     {
         cout << "Could not load font" << endl;
         exit(0);
-    } 
+    } //font exit incase it didn't transfer
 
     //make our walls, ceiling, and floor so the ball doesn't go flying off screen
     PhysicsRectangle floor; 
@@ -99,7 +99,7 @@ int main()
     world.AddPhysicsBody(ball);
     
     //add some velo to get the direction going
-    ball.applyImpulse(Vector2f(-0.04, 1.1));
+    ball.applyImpulse(Vector2f(-0.04, 1.05));
 
     //make the bounce bar
     PhysicsSprite& bar = *new PhysicsSprite(); 
@@ -148,9 +148,9 @@ int main()
         rBrick.onCollision = [&ball, &world, &rBrick, &redBricks, &score, &hitCountR, &hitTex, &i, &redTex](PhysicsBodyCollisionResult result)
             {
                 
-                    if (result.object2 == ball)
+                    if (result.object2 == ball)//if the ball hits rBrick
                     {
-                        ++hitCountR;
+                        ++hitCountR; //red hit count goes up by one
                         rBrick.setTexture(hitTex); //change the brick color so the player knows it has been hit
                         
                     }
