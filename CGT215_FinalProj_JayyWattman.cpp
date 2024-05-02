@@ -1,10 +1,12 @@
-// CGT215_FinalProj_JayyWattman.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// CGT215_FinalProj_JayyWattman.cpp : This file contains the 'main' function. Brick Breaker game with music.
+//  Bar should be moveable with right and left arrow keys, bricks should change color after 1 hit and disappear after 2
 //
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFPhysics.h>
 #include <vector>
+#include <map> // need this so I can map the hit counts for each brick in each physicsShapeList
 #include <SFML/Audio.hpp>
 
 using namespace std;
@@ -12,7 +14,7 @@ using namespace sf;
 using namespace sfp;
 
 //keyboard speed constant, affects how much power each key press imparts on the cbow
-const float KB_Speed = 0.6; // magic number, might need to adjust
+const float KB_Speed = 0.7; // magic number, might need to adjust
 
 //function for loading textures that can be referenced later
 void LoadTex(Texture& tex, string filename)
@@ -50,13 +52,15 @@ int main()
     int score(0); //start at zero because you haven't earned any points yet
     int lives(3); //start at 5 so it can decrement down
 
+    map<PhysicsShape*, int> hitCounts; //map to keep track of hits to each brick
+
     //get some music going
-   /* Music music;
+    Music music;
     if (!music.openFromFile("loop1.ogg")) {
         cout << "failed to load loop music";
         exit(6);
     }
-    music.play();*/
+    music.play();
 
     Font font;
     if (!font.loadFromFile("arial.ttf"))
@@ -99,7 +103,7 @@ int main()
     world.AddPhysicsBody(ball);
     
     //add some velo to get the direction going
-    ball.applyImpulse(Vector2f(-0.04, 1.05));
+    ball.applyImpulse(Vector2f(-0.04, 1.1));
 
     //make the bounce bar
     PhysicsSprite& bar = *new PhysicsSprite(); 
@@ -126,12 +130,6 @@ int main()
 
    
     //let's start making the bricks
-    int hitCountR(0);
-    int hitCountO(0);
-    int hitCountY(0);
-    int hitCountG(0);
-    int hitCountB(0);
-    int hitCountP(0);//gonna need something to keep track of how many times a brick was hit
     Texture redTex, orangeTex, yellTex, greenTex, blueTex, purpTex, hitTex;
     LoadTex(hitTex, "images/hit1.png");
     LoadTex(redTex, "images/redBrick.png");
@@ -139,29 +137,29 @@ int main()
     for (int i(0); i < 11; i++) 
     {
         PhysicsSprite& rBrick = redBricks.Create();
+        hitCounts[&rBrick] = 0; //hit counts with reference to red bricks
         rBrick.setTexture(redTex);
         Vector2f sz = rBrick.getSize();
         rBrick.setCenter(Vector2f((((1000 / 10) * i)), 280)); 
         rBrick.setStatic(true); //don't want em moving
         world.AddPhysicsBody(rBrick);
   
-        rBrick.onCollision = [&ball, &world, &rBrick, &redBricks, &score, &hitCountR, &hitTex, &i, &redTex](PhysicsBodyCollisionResult result)
+        rBrick.onCollision = [&ball, &world, &rBrick, &redBricks, &score, &hitTex, &i, &redTex,&hitCounts](PhysicsBodyCollisionResult result)
             {
                 
                     if (result.object2 == ball)//if the ball hits rBrick
                     {
-                        ++hitCountR; //red hit count goes up by one
+                        ++hitCounts[(PhysicsShape*)&result.object1]; //hit count for whichever red brick was hit goes up by one
                         rBrick.setTexture(hitTex); //change the brick color so the player knows it has been hit
                         
                     }
 
-                    if (hitCountR == 2)
+                    if (hitCounts[(PhysicsShape*)&result.object1] == 2) //if hit count for particular brick equals 2
                     {
                         world.RemovePhysicsBody(rBrick);
                         redBricks.QueueRemove(rBrick);
                         score += 50;
-                        hitCountR = 0;
-           
+                      
                     }
                 
             };
@@ -172,25 +170,26 @@ int main()
     for (int i(0); i < 11; i++)
     {
         PhysicsSprite& oBrick = orangeBricks.Create();
+        hitCounts[&oBrick] = 0;
         oBrick.setTexture(orangeTex);
         Vector2f sz = oBrick.getSize();
         oBrick.setCenter(Vector2f((((1000 / 10) * i)), 245));
         oBrick.setStatic(true);
         world.AddPhysicsBody(oBrick);
-        oBrick.onCollision = [&ball, &world, &oBrick, &orangeBricks, &score, &hitCountO, &hitTex](PhysicsBodyCollisionResult result)
+        oBrick.onCollision = [&ball, &world, &oBrick, &orangeBricks, &score, &hitTex,&hitCounts](PhysicsBodyCollisionResult result)
             {
                 if (result.object2 == ball)
                 {
-                    ++hitCountO;
+                    ++hitCounts[(PhysicsShape*)&result.object1];
                     oBrick.setTexture(hitTex);
 
                 }
-                if (hitCountO == 2)
+                if (hitCounts[(PhysicsShape*)&result.object1] == 2)
                 {
                     world.RemovePhysicsBody(oBrick);
                     orangeBricks.QueueRemove(oBrick);
                     score += 50;
-                    hitCountO = 0;
+
                 }
             };
     }
@@ -200,25 +199,26 @@ int main()
     for (int i(0); i < 11; i++)
     {
         PhysicsSprite& yBrick = yellowBricks.Create();
+        hitCounts[&yBrick] = 0;
         yBrick.setTexture(yellTex);
         Vector2f sz = yBrick.getSize();
         yBrick.setCenter(Vector2f((((1000 / 10) * i)), 210));
         yBrick.setStatic(true);
         world.AddPhysicsBody(yBrick);
-        yBrick.onCollision = [&ball, &world, &yBrick, &yellowBricks, &score, &hitCountY, &hitTex](PhysicsBodyCollisionResult result)
+        yBrick.onCollision = [&ball, &world, &yBrick, &yellowBricks, &score, &hitTex, &hitCounts](PhysicsBodyCollisionResult result)
             {
                 if (result.object2 == ball)
                 {
-                    ++hitCountY;
+                    ++hitCounts[(PhysicsShape*)&result.object1];
                     yBrick.setTexture(hitTex);
 
                 }
-                if (hitCountY == 2)
+                if (hitCounts[(PhysicsShape*)&result.object1] == 2)
                 {
                     world.RemovePhysicsBody(yBrick);
                     yellowBricks.QueueRemove(yBrick);
                     score += 50;
-                    hitCountY = 0;
+
                 }
             };
     }
@@ -228,25 +228,25 @@ int main()
     for (int i(0); i < 11; i++)
     {
         PhysicsSprite& gBrick = greenBricks.Create();
+        hitCounts[&gBrick] = 0;
         gBrick.setTexture(greenTex);
         Vector2f sz = gBrick.getSize();
         gBrick.setCenter(Vector2f((((1000 / 10) * i)), 175));
         gBrick.setStatic(true);
         world.AddPhysicsBody(gBrick);
-        gBrick.onCollision = [&ball, &world, &gBrick, &greenBricks, &score, &hitCountG, &hitTex](PhysicsBodyCollisionResult result)
+        gBrick.onCollision = [&ball, &world, &gBrick, &greenBricks, &score, &hitTex, &hitCounts](PhysicsBodyCollisionResult result)
             {
                 if (result.object2 == ball)
                 {
-                    ++hitCountG;
+                    ++hitCounts[(PhysicsShape*)&result.object1];
                     gBrick.setTexture(hitTex);
 
                 }
-                if (hitCountG == 2)
+                if (hitCounts[(PhysicsShape*)&result.object1] == 2)
                 {
                     world.RemovePhysicsBody(gBrick);
                     greenBricks.QueueRemove(gBrick);
                     score += 50;
-                    hitCountG = 0;
                 }
             };
     }
@@ -256,25 +256,25 @@ int main()
     for (int i(0); i < 11; i++)
     {
         PhysicsSprite& bBrick = blueBricks.Create();
+        hitCounts[&bBrick] = 0;
         bBrick.setTexture(blueTex);
         Vector2f sz = bBrick.getSize();
         bBrick.setCenter(Vector2f((((1000 / 10) * i)), 140));
         bBrick.setStatic(true);
         world.AddPhysicsBody(bBrick);
-        bBrick.onCollision = [&ball, &world, &bBrick, &blueBricks, &score, &hitCountB, &hitTex](PhysicsBodyCollisionResult result)
+        bBrick.onCollision = [&ball, &world, &bBrick, &blueBricks, &score, &hitTex, &hitCounts](PhysicsBodyCollisionResult result)
             {
                 if (result.object2 == ball)
                 {
-                    ++hitCountB;
+                    ++hitCounts[(PhysicsShape*)&result.object1];
                     bBrick.setTexture(hitTex);
 
                 }
-                if (hitCountB == 2)
+                if (hitCounts[(PhysicsShape*)&result.object1] == 2)
                 {
                     world.RemovePhysicsBody(bBrick);
                     blueBricks.QueueRemove(bBrick);
                     score += 50;
-                    hitCountB = 0;
                 }
             };
     }
@@ -284,25 +284,25 @@ int main()
     for (int i(0); i < 11; i++)
     {
         PhysicsSprite& pBrick = purpBricks.Create();
+        hitCounts[&pBrick] = 0;
         pBrick.setTexture(purpTex);
         Vector2f sz = pBrick.getSize();
         pBrick.setCenter(Vector2f((((1000 / 10) * i)), 105)); 
         pBrick.setStatic(true);
         world.AddPhysicsBody(pBrick);
-        pBrick.onCollision = [&ball, &world, &pBrick, &purpBricks, &score, &hitCountP, &hitTex](PhysicsBodyCollisionResult result)
+        pBrick.onCollision = [&ball, &world, &pBrick, &purpBricks, &score, &hitTex, &hitCounts](PhysicsBodyCollisionResult result)
             {
                 if (result.object2 == ball)
                 {
-                    ++hitCountP;
+                    ++hitCounts[(PhysicsShape* )&result.object1];
                     pBrick.setTexture(hitTex);
 
                 }
-                if (hitCountP == 2)
+                if (hitCounts[(PhysicsShape*)&result.object1] == 2)
                 {
                     world.RemovePhysicsBody(pBrick);
                     purpBricks.QueueRemove(pBrick);
                     score += 50;
-                    hitCountP = 0;
                 }
             };
     }
